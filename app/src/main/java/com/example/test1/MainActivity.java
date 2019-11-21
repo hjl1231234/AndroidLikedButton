@@ -1,7 +1,10 @@
 package com.example.test1;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
@@ -18,6 +21,13 @@ public class MainActivity extends AppCompatActivity {
 
 //切换了布局模式才能出现这个类
     ActivityMainBinding binding;
+
+
+
+
+
+    //防止后台杀死1
+    final static String KEY_NUM="my_num";
 
 
     @Override
@@ -43,9 +53,27 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
+
+        //防止后台杀死2
+        if(savedInstanceState!=null){
+            myViewModel.getLikedNum().setValue(savedInstanceState.getInt(KEY_NUM));
+        }
+
+
+
         //这两句可以替代之前的observe方法，在xml中配置好text标签
         binding.setData(myViewModel);
         binding.setLifecycleOwner(this);
+
+
+        //持久化方法写oncreate中
+        SharedPreferences shp=getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor=shp.edit();
+        editor.putInt("NUM",100);
+        //异步提交
+        editor.apply();
+
+
 
 
 
@@ -97,6 +125,15 @@ public class MainActivity extends AppCompatActivity {
 //
 //            }
 //        });
+
+    }
+    //防止后台杀死3
+
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_NUM,myViewModel.getLikedNum().getValue());
 
     }
 }
